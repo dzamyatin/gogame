@@ -1,0 +1,45 @@
+version: "3.9"
+
+networks:
+  app:
+    attachable: true
+    internal: true
+
+services:
+  app:
+    container_name: ${APP_NAME}_app
+    networks:
+      app:
+        aliases:
+          - app
+    build:
+      context: ./app
+      dockerfile: ./app/Dockerfile
+      target: development
+    ports:
+      - '${APP_PORT}:80'
+  frontend:
+    container_name: ${APP_NAME}_frontend
+    networks:
+      app:
+        aliases:
+          - app
+    build:
+      context: ./app
+      dockerfile: ./app/Dockerfile
+      target: development
+  reverse_proxy:
+    container_name: ${APP_NAME}_reverse_proxy
+    networks:
+      app:
+        aliases:
+          - app
+    image: nginx:latest
+    ports:
+      - '${APP_PORT}:80'
+    depends_on:
+      - app
+    build:
+      context: ./reverse_proxy
+      dockerfile: ./reverse_proxy/Dockerfile
+
